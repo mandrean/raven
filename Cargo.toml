@@ -10,6 +10,11 @@ documentation = "https://docs.rs/rvn"
 readme = "README.md"
 keywords = ["maven", "mvn", "cli", "java", "pom"]
 
+[dependencies]
+clap = "2.33.0"
+regex = "1"
+reqwest = "0.9.17"
+
 [profile.release]
 opt-level = "z"
 lto = "thin"
