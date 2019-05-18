@@ -1,0 +1,17 @@
+[package]
+name = "rvn"
+version = "0.0.0"
+authors = ["Sebastian Mandrean <sebastian.mandrean@gmail.com>"]
+edition = "2018"
+description = "A CLI tool for interacting with Maven repositories & artifacts"
+license = "MIT"
+repository = "https://github.com/mandrean/raven"
+documentation = "https://docs.rs/rvn"
+readme = "README.md"
+keywords = ["maven", "mvn", "cli", "java", "pom"]
+
+[profile.release]
+opt-level = "z"
+lto = "thin"
+codegen-units = 1
+panic = "abort"
