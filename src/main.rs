@@ -5,7 +5,7 @@ use rvn::{MavenCoordinates};
 
 fn main() {
     let matches = App::new("raven")
-        .version("0.1.0")
+        .version("0.1.1")
         .author("Sebastian Mandrean <sebastian.mandrean@gmail.com>")
         .about("A CLI tool for interacting with Maven repositories & artifacts")
         .subcommand(SubCommand::with_name("checksum")
