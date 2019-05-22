@@ -26,18 +26,21 @@ impl<'a> MavenCoordinates<'a> {
     ///
     /// let coordinates = MavenCoordinates::parse("com.fasterxml.jackson.core:jackson-annotations:2.9.9").unwrap();
     /// ```
-    pub fn parse(maven_coordinates: &str) -> Result<MavenCoordinates, Error> {
+    pub fn parse(maven_coordinates: &str) -> Option<MavenCoordinates> {
         // Parse Maven coordinates into named capture groups, with optional packaging OR packaging+classifier
-        let regexp = Regex::new(r"^(?P<groupId>[\w.\-]+):(?P<artifactId>[\w.\-]+)(?:(?::(?P<packaging>[\w.\-]+))(?::(?P<classifier>[\w.\-]+)?)?)?:(?P<version>[\w.\-]+)$").unwrap();
-        let matches = regexp.captures(maven_coordinates).unwrap();
+        let regexp = Regex::new(r"^(?P<groupId>[\w.\-]+):(?P<artifactId>[\w.\-]+)(?:(?::(?P<packaging>[\w.\-]+))(?::(?P<classifier>[\w.\-]+)?)?)?:(?P<version>[\w.\-]+)$")
+            .expect("Error compiling regex");
 
-        Ok(MavenCoordinates {
-            group_id: &matches.name("groupId").unwrap().as_str(),
-            artifact_id: matches.name("artifactId").unwrap().as_str(),
-            packaging: matches.name("packaging").map(|m| m.as_str()),
-            classifier: matches.name("classifier").map(|m| m.as_str()),
-            version: &matches.name("version").unwrap().as_str(),
-        })
+        match regexp.captures(maven_coordinates) {
+            Some(capture) => Some(MavenCoordinates {
+                group_id: capture.name("groupId").unwrap().as_str(),
+                artifact_id: capture.name("artifactId").unwrap().as_str(),
+                packaging: capture.name("packaging").map(|m| m.as_str()),
+                classifier: capture.name("classifier").map(|m| m.as_str()),
+                version: capture.name("version").unwrap().as_str(),
+            }),
+            None => None,
+        }
     }
 
     /// Fetch the checksum associated with the Maven coordinates.
@@ -64,14 +67,14 @@ impl<'a> MavenCoordinates<'a> {
                                packaging = self.packaging.unwrap_or("jar"),
                                algorithm = algorithm);
 
-        let mut url = Url::parse(repository).unwrap();
+        let mut url = Url::parse(repository).expect("Error parsing repository URL");
         url.path_segments_mut().map_err(|_| "cannot be base").unwrap()
             .pop_if_empty().push(&join_uri);
 
-        let mut response = reqwest::get(url).unwrap();
-
-        let checksum = response.text()?;
-        Ok(checksum)
+        match reqwest::get(url) {
+            Result::Ok(mut res) => Ok(res.text()?),
+            Result::Err(err) => Err(err),
+        }
     }
 }
 
