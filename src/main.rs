@@ -3,9 +3,11 @@ extern crate clap;
 use clap::{App, Arg, SubCommand};
 use rvn::{MavenCoordinates};
 
+const RVN_VERSION: &'static str = env!("CARGO_PKG_VERSION");
+
 fn main() {
     let matches = App::new("raven")
-        .version("0.1.1")
+        .version(RVN_VERSION)
         .author("Sebastian Mandrean <sebastian.mandrean@gmail.com>")
         .about("A CLI tool for interacting with Maven repositories & artifacts")
         .subcommand(SubCommand::with_name("checksum")
