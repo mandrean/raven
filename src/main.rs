@@ -4,12 +4,14 @@ use clap::{App, Arg, SubCommand};
 use rvn::{MavenCoordinates};
 
 const RVN_VERSION: &'static str = env!("CARGO_PKG_VERSION");
+const RVN_AUTHORS: &'static str = env!("CARGO_PKG_AUTHORS");
+const RVN_DESCRIPTION: &'static str = env!("CARGO_PKG_DESCRIPTION");
 
 fn main() {
     let matches = App::new("raven")
         .version(RVN_VERSION)
-        .author("Sebastian Mandrean <sebastian.mandrean@gmail.com>")
-        .about("A CLI tool for interacting with Maven repositories & artifacts")
+        .author(RVN_AUTHORS)
+        .about(RVN_DESCRIPTION)
         .subcommand(SubCommand::with_name("checksum")
             .about("Prints checksum of Maven artifact")
             .arg(Arg::with_name("Maven coordinates")
