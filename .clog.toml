@@ -3,8 +3,6 @@
 [sections]
 "Bug Fixes" = ["fx", "fix"]
 Builds = ["build"]
-Chores = ["chore"]
-"Continuous Integrations" = ["ci"]
 Documentation = ["docs"]
 Features = ["ft", "feat", "feature"]
 Refactorings = ["ref", "refactor"]
