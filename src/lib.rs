@@ -28,7 +28,7 @@ impl<'a> MavenCoordinates<'a> {
     /// ```
     pub fn parse(maven_coordinates: &str) -> Result<MavenCoordinates, Error> {
         // Parse Maven coordinates into named capture groups, with optional packaging OR packaging+classifier
-        let regexp = Regex::new(r"^(?P<groupId>[\w.]+):(?P<artifactId>[\w.\-]+)(?:(?::(?P<packaging>[\w]+))(?::(?P<classifier>[\w]+)?)?)?:(?P<version>[\w.\-]+)$").unwrap();
+        let regexp = Regex::new(r"^(?P<groupId>[\w.\-]+):(?P<artifactId>[\w.\-]+)(?:(?::(?P<packaging>[\w.\-]+))(?::(?P<classifier>[\w.\-]+)?)?)?:(?P<version>[\w.\-]+)$").unwrap();
         let matches = regexp.captures(maven_coordinates).unwrap();
 
         Ok(MavenCoordinates {
@@ -114,6 +114,19 @@ mod tests {
             packaging: Some("jar"),
             classifier: Some("sources"),
             version: "2.9.9",
+        };
+        assert_eq!(MavenCoordinates::parse(provided).unwrap(), expected);
+    }
+
+    #[test]
+    fn test_parse_unorthodox_maven_coordinate() {
+        let provided = "io.get-coursier:coursier-cli_2.12:jar:standalone:1.1.0-M14-4";
+        let expected = MavenCoordinates {
+            group_id: "io.get-coursier",
+            artifact_id: "coursier-cli_2.12",
+            packaging: Some("jar"),
+            classifier: Some("standalone"),
+            version: "1.1.0-M14-4",
         };
         assert_eq!(MavenCoordinates::parse(provided).unwrap(), expected);
     }
