@@ -1,3 +1,17 @@
+<a name="v0.2.0"></a>
+## v0.2.0 (2019-05-22)
+
+
+#### Bug Fixes
+
+*   Support unorthodox Maven coordinates ([9300ae09](9300ae09))
+
+#### Features
+
+*   Read raven version from Cargo.toml ([3ca869b6](3ca869b6))
+
+
+
 <a name="v0.1.1"></a>
 ## v0.1.1 (2019-05-22)
 
