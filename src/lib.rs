@@ -68,8 +68,11 @@ impl<'a> MavenCoordinates<'a> {
                                algorithm = algorithm);
 
         let mut url = Url::parse(repository).expect("Error parsing repository URL");
-        url.path_segments_mut().map_err(|_| "cannot be base").unwrap()
-            .pop_if_empty().push(&join_uri);
+        url.path_segments_mut()
+            .map_err(|_| "cannot be base")
+            .unwrap()
+            .pop_if_empty()
+            .push(&join_uri);
 
         match reqwest::get(url) {
             Result::Ok(mut res) => Ok(res.text()?),

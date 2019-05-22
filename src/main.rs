@@ -1,7 +1,7 @@
 extern crate clap;
 
 use clap::{App, Arg, SubCommand};
-use rvn::{MavenCoordinates};
+use rvn::MavenCoordinates;
 
 const RVN_VERSION: &'static str = env!("CARGO_PKG_VERSION");
 const RVN_AUTHORS: &'static str = env!("CARGO_PKG_AUTHORS");
@@ -12,26 +12,33 @@ fn main() {
         .version(RVN_VERSION)
         .author(RVN_AUTHORS)
         .about(RVN_DESCRIPTION)
-        .subcommand(SubCommand::with_name("checksum")
-            .about("Prints checksum of Maven artifact")
-            .arg(Arg::with_name("Maven coordinates")
-                .help("Maven coordinates of artifact")
-                .index(1)
-                .required(true))
-            .arg(Arg::with_name("algorithm")
-                .help("cryptographic hash algorithm")
-                .short("a")
-                .long("algo")
-                .alias("algorithm")
-                .default_value("sha1"))
+        .subcommand(
+            SubCommand::with_name("checksum")
+                .about("Prints checksum of Maven artifact")
+                .arg(
+                    Arg::with_name("Maven coordinates")
+                        .help("Maven coordinates of artifact")
+                        .index(1)
+                        .required(true),
+                )
+                .arg(
+                    Arg::with_name("algorithm")
+                        .help("cryptographic hash algorithm")
+                        .short("a")
+                        .long("algo")
+                        .alias("algorithm")
+                        .default_value("sha1"),
+                ),
         )
-        .arg(Arg::with_name("repository")
-            .help("Maven repository URL")
-            .short("r")
-            .long("repo")
-            .alias("repository")
-            .global(true)
-            .default_value("https://repo1.maven.org/maven2"))
+        .arg(
+            Arg::with_name("repository")
+                .help("Maven repository URL")
+                .short("r")
+                .long("repo")
+                .alias("repository")
+                .global(true)
+                .default_value("https://repo1.maven.org/maven2"),
+        )
         .get_matches();
 
     let repository = matches.value_of("repository").unwrap();
@@ -40,9 +47,12 @@ fn main() {
         ("checksum", Some(checksum_matches)) => {
             let algorithm = checksum_matches.value_of("algorithm").unwrap();
             let coordinates = checksum_matches.value_of("Maven coordinates").unwrap();
-            let checksum = MavenCoordinates::parse(coordinates).unwrap().fetch_checksum(repository, algorithm).unwrap();
+            let checksum = MavenCoordinates::parse(coordinates)
+                .unwrap()
+                .fetch_checksum(repository, algorithm)
+                .unwrap();
             println!("{}", checksum);
-        },
+        }
         ("", None) => println!("No subcommand was used"),
         _ => unreachable!(),
     }
