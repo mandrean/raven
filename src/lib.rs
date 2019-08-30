@@ -17,6 +17,31 @@ pub struct MavenCoordinates<'a> {
 }
 
 impl<'a> MavenCoordinates<'a> {
+    /// Constructs a new, empty `MavenCoordinates`
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use rvn::MavenCoordinates;
+    ///
+    /// let coordinates = MavenCoordinates::new("com.fasterxml.jackson.core", "jackson-annotations", None, None, "2.9.9");
+    /// ```
+    pub fn new(
+        group_id: &'a str,
+        artifact_id: &'a str,
+        packaging: Option<&'a str>,
+        classifier: Option<&'a str>,
+        version: &'a str,
+    ) -> MavenCoordinates<'a> {
+        MavenCoordinates {
+            group_id,
+            artifact_id,
+            packaging,
+            classifier,
+            version,
+        }
+    }
+
     /// Parse the Maven coordinates from a string.
     ///
     /// # Examples
@@ -88,52 +113,56 @@ mod tests {
     #[test]
     fn test_parses_three_component_maven_coordinate() {
         let provided = "com.fasterxml.jackson.core:jackson-annotations:2.9.9";
-        let expected = MavenCoordinates {
-            group_id: "com.fasterxml.jackson.core",
-            artifact_id: "jackson-annotations",
-            packaging: None,
-            classifier: None,
-            version: "2.9.9",
-        };
+        let expected = MavenCoordinates::new(
+            "com.fasterxml.jackson.core",
+            "jackson-annotations",
+            None,
+            None,
+            "2.9.9",
+        );
+
         assert_eq!(MavenCoordinates::parse(provided).unwrap(), expected);
     }
 
     #[test]
     fn test_parses_four_component_maven_coordinate() {
         let provided = "com.fasterxml.jackson.core:jackson-annotations:pom:2.9.9";
-        let expected = MavenCoordinates {
-            group_id: "com.fasterxml.jackson.core",
-            artifact_id: "jackson-annotations",
-            packaging: Some("pom"),
-            classifier: None,
-            version: "2.9.9",
-        };
+        let expected = MavenCoordinates::new(
+            "com.fasterxml.jackson.core",
+            "jackson-annotations",
+            Some("pom"),
+            None,
+            "2.9.9",
+        );
+
         assert_eq!(MavenCoordinates::parse(provided).unwrap(), expected);
     }
 
     #[test]
     fn test_parses_five_component_maven_coordinate() {
         let provided = "com.fasterxml.jackson.core:jackson-annotations:jar:sources:2.9.9";
-        let expected = MavenCoordinates {
-            group_id: "com.fasterxml.jackson.core",
-            artifact_id: "jackson-annotations",
-            packaging: Some("jar"),
-            classifier: Some("sources"),
-            version: "2.9.9",
-        };
+        let expected = MavenCoordinates::new(
+            "com.fasterxml.jackson.core",
+            "jackson-annotations",
+            Some("jar"),
+            Some("sources"),
+            "2.9.9",
+        );
+
         assert_eq!(MavenCoordinates::parse(provided).unwrap(), expected);
     }
 
     #[test]
     fn test_parse_unorthodox_maven_coordinate() {
         let provided = "io.get-coursier:coursier-cli_2.12:jar:standalone:1.1.0-M14-4";
-        let expected = MavenCoordinates {
-            group_id: "io.get-coursier",
-            artifact_id: "coursier-cli_2.12",
-            packaging: Some("jar"),
-            classifier: Some("standalone"),
-            version: "1.1.0-M14-4",
-        };
+        let expected = MavenCoordinates::new(
+            "io.get-coursier",
+            "coursier-cli_2.12",
+            Some("jar"),
+            Some("standalone"),
+            "1.1.0-M14-4",
+        );
+
         assert_eq!(MavenCoordinates::parse(provided).unwrap(), expected);
     }
 }
