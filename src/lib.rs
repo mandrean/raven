@@ -2,6 +2,7 @@ extern crate regex;
 extern crate reqwest;
 extern crate url;
 
+use core::fmt;
 use regex::Regex;
 use reqwest::Error;
 use url::Url;
@@ -14,6 +15,26 @@ pub struct MavenCoordinates<'a> {
     pub packaging: Option<&'a str>,
     pub classifier: Option<&'a str>,
     pub version: &'a str,
+}
+
+impl fmt::Display for MavenCoordinates<'_> {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(
+            f,
+            "{group_id}:{artifact_id}{packaging}{classifier}:{version}",
+            group_id = &self.group_id,
+            artifact_id = &self.artifact_id,
+            packaging = &self
+                .packaging
+                .map(|p| format!(":{}", p))
+                .unwrap_or("".to_string()),
+            classifier = &self
+                .classifier
+                .map(|c| format!(":{}", c))
+                .unwrap_or("".to_string()),
+            version = &self.version,
+        )
+    }
 }
 
 impl<'a> MavenCoordinates<'a> {
