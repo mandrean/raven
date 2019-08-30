@@ -5,6 +5,7 @@ extern crate url;
 use core::fmt;
 use regex::Regex;
 use reqwest::Error;
+use std::string::ToString;
 use url::Url;
 
 /// A parsed Maven coordinates record.
@@ -27,11 +28,11 @@ impl fmt::Display for MavenCoordinates<'_> {
             packaging = &self
                 .packaging
                 .map(|p| format!(":{}", p))
-                .unwrap_or("".to_string()),
+                .unwrap_or_else(|| "".to_string()),
             classifier = &self
                 .classifier
                 .map(|c| format!(":{}", c))
-                .unwrap_or("".to_string()),
+                .unwrap_or_else(|| "".to_string()),
             version = &self.version,
         )
     }
