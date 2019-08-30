@@ -73,20 +73,29 @@ impl<'a> MavenCoordinates<'a> {
     ///
     /// let coordinates = MavenCoordinates::parse("com.fasterxml.jackson.core:jackson-annotations:2.9.9").unwrap();
     /// ```
-    pub fn parse(maven_coordinates: &str) -> Option<MavenCoordinates> {
+    pub fn parse(maven_coordinates: &str) -> Result<MavenCoordinates, &'static str> {
         // Parse Maven coordinates into named capture groups, with optional packaging OR packaging+classifier
         let regexp = Regex::new(r"^(?P<groupId>[\w.\-]+):(?P<artifactId>[\w.\-]+)(?:(?::(?P<packaging>[\w.\-]+))(?::(?P<classifier>[\w.\-]+)?)?)?:(?P<version>[\w.\-]+)$")
             .expect("Error compiling regex");
 
         match regexp.captures(maven_coordinates) {
-            Some(capture) => Some(MavenCoordinates {
-                group_id: capture.name("groupId").unwrap().as_str(),
-                artifact_id: capture.name("artifactId").unwrap().as_str(),
-                packaging: capture.name("packaging").map(|m| m.as_str()),
-                classifier: capture.name("classifier").map(|m| m.as_str()),
-                version: capture.name("version").unwrap().as_str(),
-            }),
-            None => None,
+            Some(capture) => Ok(MavenCoordinates::new(
+                capture
+                    .name("groupId")
+                    .map(|m| m.as_str())
+                    .expect("Missing groupId"),
+                capture
+                    .name("artifactId")
+                    .map(|m| m.as_str())
+                    .expect("Missing artifactId"),
+                capture.name("packaging").map(|m| m.as_str()),
+                capture.name("classifier").map(|m| m.as_str()),
+                capture
+                    .name("version")
+                    .map(|m| m.as_str())
+                    .expect("Missing version"),
+            )),
+            None => Err("Couldn't parse Maven coordinates"),
         }
     }
 
