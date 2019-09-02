@@ -15,8 +15,8 @@ clap = "2.33.0"
 log = "0.4"
 regex = "1"
 reqwest = "0.9.20"
-strum = { git = "https://github.com/Peternator7/strum", rev = "efed58502a40ac101691068bbc6c20a0b351f3fd" }
-strum_macros = { git = "https://github.com/Peternator7/strum", rev = "efed58502a40ac101691068bbc6c20a0b351f3fd" }
+strum = { version = "0.16.0", git = "https://github.com/Peternator7/strum", branch = "refactor" }
+strum_macros = { version = "0.15.0", git = "https://github.com/Peternator7/strum", branch = "refactor" }
 url = "2.1.0"
 
 [profile.release]
