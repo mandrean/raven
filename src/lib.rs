@@ -6,7 +6,6 @@ use crate::checksum::Algorithm;
 use core::fmt;
 use log::debug;
 use regex::Regex;
-use reqwest::Error;
 use std::string::ToString;
 use url::Url;
 
@@ -111,35 +110,52 @@ impl<'a> MavenCoordinates<'a> {
     ///
     /// ```rust
     /// use rvn::{MavenCoordinates, Algorithm};
+    /// use url::Url;
     ///
-    /// let repository = "https://repo1.maven.org/maven2";
+    /// let repository = Url::parse("https://repo1.maven.org/maven2").unwrap();
     /// let algorithm = Algorithm::Sha1;
     /// let coordinates = MavenCoordinates::parse("com.fasterxml.jackson.core:jackson-annotations:jar:sources:2.9.9").unwrap();
-    /// let checksum = coordinates.fetch_checksum(repository, algorithm).unwrap();
+    /// let checksum = coordinates.fetch_checksum(&repository, algorithm).unwrap();
     ///
     /// assert_eq!(checksum, "4ac77aa5799fcf00a9cde00cd7da4d08bdc038ff")
     /// ```
-    pub fn fetch_checksum(&self, repository: &str, algorithm: Algorithm) -> Result<String, Error> {
+    pub fn fetch_checksum(
+        &self,
+        repository: &Url,
+        algorithm: Algorithm,
+    ) -> Result<String, reqwest::Error> {
         let group_id_formatted = str::replace(self.group_id, ".", "/");
-        let join_uri = format!("{group_id}/{artifact_id}/{version}/{artifact_id}-{version}{classifier}.{packaging}.{algorithm}",
+        let artifact_uri = format!("{group_id}/{artifact_id}/{version}/{artifact_id}-{version}{classifier}.{packaging}.{algorithm}",
                                group_id = &group_id_formatted,
                                artifact_id = self.artifact_id,
                                version = self.version,
-                               classifier = self.classifier.map(|c| format!("-{}", c)).unwrap_or("".to_string()),
+                               classifier = self.classifier.map(|c| format!("-{}", c)).unwrap_or_else(|| "".to_owned()),
                                packaging = self.packaging.unwrap_or("jar"),
                                algorithm = algorithm.to_string());
 
-        let mut url = Url::parse(repository).expect("Error parsing repository URL");
-        url.path_segments_mut()
-            .map_err(|_| "cannot be base")
-            .unwrap()
-            .pop_if_empty()
-            .push(&join_uri);
+        let artifact_url = repository
+            .clone()
+            .append_segment(&artifact_uri)
+            .expect("Couldn't append artifact URI to repository URL");
 
-        match reqwest::get(url) {
-            Result::Ok(mut res) => Ok(res.text()?),
-            Result::Err(err) => Err(err),
-        }
+        reqwest::get(artifact_url.as_str())?
+            .error_for_status()?
+            .text()
+    }
+}
+
+trait MutSegments {
+    fn append_segment(&mut self, uri: &str) -> Result<Url, &'static str>;
+}
+
+impl MutSegments for Url {
+    fn append_segment(&mut self, uri: &str) -> Result<Url, &'static str> {
+        self.path_segments_mut()
+            .map_err(|_| "cannot be base")?
+            .pop_if_empty()
+            .push(&uri);
+
+        Ok(self.to_owned())
     }
 }
 

@@ -4,6 +4,7 @@ use clap::{App, Arg, SubCommand};
 use rvn::checksum::Algorithm;
 use rvn::MavenCoordinates;
 use std::str::FromStr;
+use url::Url;
 
 const RVN_VERSION: &'static str = env!("CARGO_PKG_VERSION");
 const RVN_AUTHORS: &'static str = env!("CARGO_PKG_AUTHORS");
@@ -44,7 +45,10 @@ fn main() {
         )
         .get_matches();
 
-    let repository = matches.value_of("repository").unwrap();
+    let repository = match matches.value_of("repository").map(|s| Url::parse(s)) {
+        Some(Ok(url)) => url,
+        _ => return eprintln!("Error parsing repository URL"),
+    };
 
     match matches.subcommand() {
         ("checksum", Some(checksum_matches)) => {
@@ -57,7 +61,7 @@ fn main() {
             let coordinates = checksum_matches.value_of("Maven coordinates").unwrap();
             let checksum = MavenCoordinates::parse(coordinates)
                 .unwrap()
-                .fetch_checksum(repository, algorithm)
+                .fetch_checksum(&repository, algorithm)
                 .unwrap();
             println!("{}", checksum);
         }

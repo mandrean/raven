@@ -964,7 +964,7 @@ dependencies = [
  "reqwest 0.9.20 (registry+https://github.com/rust-lang/crates.io-index)",
  "strum 0.15.0 (git+https://github.com/Peternator7/strum?rev=efed58502a40ac101691068bbc6c20a0b351f3fd)",
  "strum_macros 0.15.0 (git+https://github.com/Peternator7/strum?rev=efed58502a40ac101691068bbc6c20a0b351f3fd)",
- "url 1.7.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "url 2.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
