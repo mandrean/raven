@@ -1,6 +1,6 @@
 extern crate clap;
 
-use clap::{App, Arg, SubCommand};
+use clap::{App, Arg, ArgMatches, SubCommand};
 use reqwest::StatusCode;
 use rvn::checksum::Algorithm;
 use rvn::MavenCoordinates;
@@ -51,24 +51,38 @@ fn main() {
         _ => return eprintln!("Error parsing repository URL"),
     };
 
+    subcommands(&matches, &repository)
+}
+
+fn subcommands(matches: &ArgMatches, repository: &Url) {
     match matches.subcommand() {
-        ("checksum", Some(checksum_matches)) => {
-            let algorithm = Algorithm::from_str(
-                checksum_matches
-                    .value_of("algorithm")
-                    .expect("Missing checksum algorithm"),
-            )
-            .expect("Error parsing Algorithm");
-            let coordinates = checksum_matches.value_of("Maven coordinates").unwrap();
-            let checksum = MavenCoordinates::parse(coordinates)
-                .unwrap()
-                .fetch_checksum(&repository, algorithm)
-                .unwrap();
-            println!("{}", checksum);
-        }
+        ("checksum", Some(checksum_matches)) => checksum_cmd(repository, checksum_matches),
         ("", None) => println!("No subcommand was used"),
         _ => unreachable!(),
     }
+}
+
+fn checksum_cmd(repository: &Url, checksum_matches: &ArgMatches) {
+    let algorithm = Algorithm::from_str(
+        checksum_matches
+            .value_of("algorithm")
+            .expect("Missing checksum algorithm"),
+    )
+    .expect("Error parsing Algorithm");
+
+    let coordinates = match MavenCoordinates::parse(
+        checksum_matches
+            .value_of("Maven coordinates")
+            .expect("Missing Maven coordinates"),
+    ) {
+        Ok(c) => c,
+        Err(e) => return eprintln!("{}", e),
+    };
+
+    match coordinates.fetch_checksum(repository, algorithm) {
+        Ok(checksum) => println!("{}", checksum),
+        Err(e) => handler(&coordinates, e),
+    };
 }
 
 fn handler(coordinates: &MavenCoordinates, e: reqwest::Error) {
