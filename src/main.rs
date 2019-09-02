@@ -85,6 +85,7 @@ fn checksum_cmd(repository: &Url, checksum_matches: &ArgMatches) {
     };
 }
 
+// TODO: Refactor using match guards when https://github.com/rust-lang/rust/pull/63118 is merged
 fn handler(coordinates: &MavenCoordinates, e: reqwest::Error) {
     if e.is_http() {
         match e.url() {
