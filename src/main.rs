@@ -1,7 +1,9 @@
 extern crate clap;
 
 use clap::{App, Arg, SubCommand};
+use rvn::checksum::Algorithm;
 use rvn::MavenCoordinates;
+use std::str::FromStr;
 
 const RVN_VERSION: &'static str = env!("CARGO_PKG_VERSION");
 const RVN_AUTHORS: &'static str = env!("CARGO_PKG_AUTHORS");
@@ -27,7 +29,8 @@ fn main() {
                         .short("a")
                         .long("algo")
                         .alias("algorithm")
-                        .default_value("sha1"),
+                        .possible_values(&Algorithm::variants())
+                        .default_value(Algorithm::Sha1.into()),
                 ),
         )
         .arg(
@@ -45,7 +48,12 @@ fn main() {
 
     match matches.subcommand() {
         ("checksum", Some(checksum_matches)) => {
-            let algorithm = checksum_matches.value_of("algorithm").unwrap();
+            let algorithm = Algorithm::from_str(
+                checksum_matches
+                    .value_of("algorithm")
+                    .expect("Missing checksum algorithm"),
+            )
+            .expect("Error parsing Algorithm");
             let coordinates = checksum_matches.value_of("Maven coordinates").unwrap();
             let checksum = MavenCoordinates::parse(coordinates)
                 .unwrap()

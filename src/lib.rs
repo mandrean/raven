@@ -2,11 +2,14 @@ extern crate regex;
 extern crate reqwest;
 extern crate url;
 
+use crate::checksum::Algorithm;
 use core::fmt;
 use regex::Regex;
 use reqwest::Error;
 use std::string::ToString;
 use url::Url;
+
+pub mod checksum;
 
 /// A parsed Maven coordinates record.
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -104,16 +107,16 @@ impl<'a> MavenCoordinates<'a> {
     /// # Examples
     ///
     /// ```rust
-    /// use rvn::MavenCoordinates;
+    /// use rvn::{MavenCoordinates, Algorithm};
     ///
     /// let repository = "https://repo1.maven.org/maven2";
-    /// let algorithm = "sha1";
+    /// let algorithm = Algorithm::Sha1;
     /// let coordinates = MavenCoordinates::parse("com.fasterxml.jackson.core:jackson-annotations:jar:sources:2.9.9").unwrap();
-    /// let checksum = coordinates.fetch_checksum(repository, "sha1").unwrap();
+    /// let checksum = coordinates.fetch_checksum(repository, algorithm).unwrap();
     ///
     /// assert_eq!(checksum, "4ac77aa5799fcf00a9cde00cd7da4d08bdc038ff")
     /// ```
-    pub fn fetch_checksum(&self, repository: &str, algorithm: &str) -> Result<String, Error> {
+    pub fn fetch_checksum(&self, repository: &str, algorithm: Algorithm) -> Result<String, Error> {
         let group_id_formatted = str::replace(self.group_id, ".", "/");
         let join_uri = format!("{group_id}/{artifact_id}/{version}/{artifact_id}-{version}{classifier}.{packaging}.{algorithm}",
                                group_id = &group_id_formatted,
@@ -121,7 +124,7 @@ impl<'a> MavenCoordinates<'a> {
                                version = self.version,
                                classifier = self.classifier.map(|c| format!("-{}", c)).unwrap_or("".to_string()),
                                packaging = self.packaging.unwrap_or("jar"),
-                               algorithm = algorithm);
+                               algorithm = algorithm.to_string());
 
         let mut url = Url::parse(repository).expect("Error parsing repository URL");
         url.path_segments_mut()
