@@ -7,9 +7,9 @@ use rvn::MavenCoordinates;
 use std::str::FromStr;
 use url::Url;
 
-const RVN_VERSION: &'static str = env!("CARGO_PKG_VERSION");
-const RVN_AUTHORS: &'static str = env!("CARGO_PKG_AUTHORS");
-const RVN_DESCRIPTION: &'static str = env!("CARGO_PKG_DESCRIPTION");
+const RVN_VERSION: &str = env!("CARGO_PKG_VERSION");
+const RVN_AUTHORS: &str = env!("CARGO_PKG_AUTHORS");
+const RVN_DESCRIPTION: &str = env!("CARGO_PKG_DESCRIPTION");
 
 fn main() {
     let matches = App::new("raven")
