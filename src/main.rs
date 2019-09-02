@@ -1,6 +1,7 @@
 extern crate clap;
 
 use clap::{App, Arg, SubCommand};
+use reqwest::StatusCode;
 use rvn::checksum::Algorithm;
 use rvn::MavenCoordinates;
 use std::str::FromStr;
@@ -67,5 +68,33 @@ fn main() {
         }
         ("", None) => println!("No subcommand was used"),
         _ => unreachable!(),
+    }
+}
+
+fn handler(coordinates: &MavenCoordinates, e: reqwest::Error) {
+    if e.is_http() {
+        match e.url() {
+            None => eprintln!("No Url given"),
+            Some(url) => eprintln!("Problem making request to: {}", url),
+        }
+    }
+
+    if e.is_client_error() {
+        match e.status() {
+            Some(StatusCode::NOT_FOUND) => eprintln!("Couldn't find artifact: {}", coordinates),
+            _ => return,
+        }
+    }
+
+    if e.is_serialization() {
+        let serde_error = match e.get_ref() {
+            None => return,
+            Some(err) => err,
+        };
+        eprintln!("Problem parsing information {}", serde_error);
+    }
+
+    if e.is_redirect() {
+        eprintln!("Server redirecting too many times or making loop");
     }
 }
