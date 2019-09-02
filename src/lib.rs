@@ -4,6 +4,7 @@ extern crate url;
 
 use crate::checksum::Algorithm;
 use core::fmt;
+use log::debug;
 use regex::Regex;
 use reqwest::Error;
 use std::string::ToString;
@@ -77,6 +78,8 @@ impl<'a> MavenCoordinates<'a> {
     /// let coordinates = MavenCoordinates::parse("com.fasterxml.jackson.core:jackson-annotations:2.9.9").unwrap();
     /// ```
     pub fn parse(maven_coordinates: &str) -> Result<MavenCoordinates, &'static str> {
+        debug!("Trying to parse Maven coordinates: {}", maven_coordinates);
+
         // Parse Maven coordinates into named capture groups, with optional packaging OR packaging+classifier
         let regexp = Regex::new(r"^(?P<groupId>[\w.\-]+):(?P<artifactId>[\w.\-]+)(?:(?::(?P<packaging>[\w.\-]+))(?::(?P<classifier>[\w.\-]+)?)?)?:(?P<version>[\w.\-]+)$")
             .expect("Error compiling regex");

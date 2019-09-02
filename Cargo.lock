@@ -959,6 +959,7 @@ name = "rvn"
 version = "0.2.0"
 dependencies = [
  "clap 2.33.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "log 0.4.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "regex 1.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "reqwest 0.9.20 (registry+https://github.com/rust-lang/crates.io-index)",
  "strum 0.15.0 (git+https://github.com/Peternator7/strum?rev=efed58502a40ac101691068bbc6c20a0b351f3fd)",

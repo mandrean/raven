@@ -12,6 +12,7 @@ keywords = ["maven", "mvn", "cli", "java", "pom"]
 
 [dependencies]
 clap = "2.33.0"
+log = "0.4"
 regex = "1"
 reqwest = "0.9.17"
 url = "1.7.2"
