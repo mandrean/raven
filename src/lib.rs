@@ -2,7 +2,7 @@ extern crate regex;
 extern crate reqwest;
 extern crate url;
 
-use crate::checksum::Algorithm;
+use crate::checksum::{Algorithm, Checksum};
 use core::fmt;
 use log::debug;
 use regex::Regex;
@@ -109,21 +109,22 @@ impl<'a> MavenCoordinates<'a> {
     /// # Examples
     ///
     /// ```rust
-    /// use rvn::{MavenCoordinates, Algorithm};
+    /// use rvn::{MavenCoordinates};
+    /// use rvn::checksum::Algorithm;
     /// use url::Url;
     ///
     /// let repository = Url::parse("https://repo1.maven.org/maven2").unwrap();
-    /// let algorithm = Algorithm::Sha1;
     /// let coordinates = MavenCoordinates::parse("com.fasterxml.jackson.core:jackson-annotations:jar:sources:2.9.9").unwrap();
-    /// let checksum = coordinates.fetch_checksum(&repository, algorithm).unwrap();
+    /// let checksum = coordinates.fetch_checksum(&repository, Algorithm::Sha1).unwrap();
     ///
-    /// assert_eq!(checksum, "4ac77aa5799fcf00a9cde00cd7da4d08bdc038ff")
+    /// assert_eq!(checksum.value, "4ac77aa5799fcf00a9cde00cd7da4d08bdc038ff");
+    /// assert_eq!(checksum.algorithm, Algorithm::Sha1);
     /// ```
     pub fn fetch_checksum(
         &self,
         repository: &Url,
         algorithm: Algorithm,
-    ) -> Result<String, reqwest::Error> {
+    ) -> Result<Checksum, reqwest::Error> {
         let group_id_formatted = str::replace(self.group_id, ".", "/");
         let artifact_uri = format!("{group_id}/{artifact_id}/{version}/{artifact_id}-{version}{classifier}.{packaging}.{algorithm}",
                                group_id = &group_id_formatted,
@@ -141,6 +142,7 @@ impl<'a> MavenCoordinates<'a> {
         reqwest::get(artifact_url.as_str())?
             .error_for_status()?
             .text()
+            .map(|s| Checksum::new(algorithm, &s))
     }
 }
 
