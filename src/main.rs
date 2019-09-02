@@ -79,9 +79,15 @@ fn checksum_cmd(repository: &Url, checksum_matches: &ArgMatches) {
         Err(e) => return eprintln!("{}", e),
     };
 
-    match coordinates.fetch_checksum(repository, algorithm) {
+    match coordinates.fetch_checksum(repository, algorithm.to_owned()) {
         Ok(checksum) => println!("{}", checksum),
-        Err(e) => handler(&coordinates, e),
+        Err(e) => match e.status() {
+            Some(StatusCode::NOT_FOUND) if e.is_client_error() => eprintln!(
+                "Couldn't find {} checksum for artifact: {}",
+                algorithm, coordinates
+            ),
+            _ => handler(&coordinates, e),
+        },
     };
 }
 

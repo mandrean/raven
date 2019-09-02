@@ -3,7 +3,7 @@ extern crate strum;
 use std::fmt;
 use strum_macros::{Display, EnumString, EnumVariantNames, IntoStaticStr};
 
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Checksum {
     pub algorithm: Algorithm,
     pub value: String,
@@ -41,7 +41,7 @@ impl fmt::Display for Checksum {
     }
 }
 
-#[derive(EnumString, EnumVariantNames, Debug, Display, Eq, PartialEq, IntoStaticStr)]
+#[derive(Clone, EnumString, EnumVariantNames, Debug, Display, Eq, PartialEq, IntoStaticStr)]
 #[strum(serialize_all = "kebab_case")]
 pub enum Algorithm {
     Md5,
