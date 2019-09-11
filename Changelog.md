@@ -1,3 +1,32 @@
+<a name="v0.3.0"></a>
+## v0.3.0 (2019-09-11)
+
+
+#### Styles
+
+*   Apply rustfmt ([f29ef579](f29ef579))
+
+#### Features
+
+*   Add error handler ([2fb4ed8f](2fb4ed8f))
+*   Add debug logging ([dc0405bb](dc0405bb))
+* **MavenCoordinates:**
+  *  Implement Display trait ([078ab402](078ab402))
+  *  Add constructor method ([b8b59e2e](b8b59e2e))
+
+#### Refactorings
+
+*   Improve error handling for checksum fetching ([bc32ce99](bc32ce99))
+*   Extract main function into separate ones ([cc50b98f](cc50b98f))
+*   Lazily evaluate fallback function calls ([63b8bf54](63b8bf54))
+
+#### Builds
+
+*   Use workaround for missing strum EnumVariantNames ([4c2d7354](4c2d7354))
+*   Use strum v0.16.0 from refactor branch ([77781253](77781253))
+
+
+
 <a name="v0.2.0"></a>
 ## v0.2.0 (2019-05-22)
 
