@@ -1,7 +1,7 @@
 extern crate strum;
 
 use std::fmt;
-use strum_macros::{Display, EnumString, EnumVariantNames, IntoStaticStr};
+use strum_macros::{Display, EnumString, IntoStaticStr};
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Checksum {
@@ -41,7 +41,7 @@ impl fmt::Display for Checksum {
     }
 }
 
-#[derive(Clone, EnumString, EnumVariantNames, Debug, Display, Eq, PartialEq, IntoStaticStr)]
+#[derive(Clone, EnumString, Debug, Display, Eq, PartialEq, IntoStaticStr)]
 #[strum(serialize_all = "kebab_case")]
 pub enum Algorithm {
     Md5,
@@ -49,4 +49,11 @@ pub enum Algorithm {
     Sha256,
     Sha384,
     Sha512,
+}
+
+// TODO: Remove once strum v0.16 is out on crates.io
+impl Algorithm {
+    pub fn variants() -> &'static [&'static str] {
+        &["md5", "sha1", "sha256", "sha384", "sha512"]
+    }
 }
